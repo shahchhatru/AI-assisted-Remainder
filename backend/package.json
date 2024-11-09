@@ -1,5 +1,8 @@
 {
   "dependencies": {
+    "dotenv": "^16.4.5",
+    "groq-sdk": "^0.7.0",
     "puppeteer": "^23.7.1"
-  }
+  },
+  "type": "module"
 }
