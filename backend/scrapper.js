@@ -38,7 +38,7 @@ async function waitForCloudflareToPass(page) {
 async function extractNavigationHtml(page) {
     try {
         return await page.evaluate(() => {
-            const navElements = document.querySelectorAll('nav, header, .header, #header, .navigation, #navigation');
+            const navElements = document.querySelectorAll('nav, header, .header, #header, .navigation, #navigation, main-nav, .main-nav, #main-nav');
             let navigationHtml = '';
             
             navElements.forEach(element => {
@@ -179,32 +179,121 @@ async function extractSearchResults(page) {
         await delay(3000);
 
         return await page.evaluate(() => {
+            // First, log the page content for debugging
+            console.log('Page HTML:', document.body.innerHTML);
+
+            // Hamrobazaar specific selectors - using only valid CSS selectors
             const productSelectors = [
                 '.product-card',
+                '.grid-cols-2 > div', 
+                '[data-testid="product-card"]',
                 '.product-item',
-                '.search-result-item',
-                '[data-test="product-card"]',
-                '.item-card',
-                '.c2prKC',
-                '.inner--SODwy',
-                '.gridItem--Yd0sa'
+                '.MuiGrid-item',
+                '.MuiCard-root',
+                '[class*="product"]',
+                '[class*="card"]'
             ];
 
             let products = [];
             for (const selector of productSelectors) {
+                console.log(`Trying selector: ${selector}`);
                 const elements = document.querySelectorAll(selector);
+                console.log(`Found ${elements.length} elements with selector ${selector}`);
+                
                 if (elements.length > 0) {
                     products = Array.from(elements).map(element => {
-                        const title = element.querySelector('h2, .title, .name, .title--wFj93')?.innerText?.trim() || '';
-                        const price = element.querySelector('.price, .amount, .currency--GVKjl')?.innerText?.trim() || '';
-                        const image = element.querySelector('img')?.src || '';
-                        const link = element.querySelector('a')?.href || '';
+                        console.log('Processing element:', element.outerHTML);
+                        
+                        // Title selectors
+                        const titleSelectors = ['h2', 'h3', 'h4', '.title', '.name', '[class*="title"]', '[class*="name"]'];
+                        let title = '';
+                        for (const selector of titleSelectors) {
+                            const titleElement = element.querySelector(selector);
+                            if (titleElement) {
+                                title = titleElement.innerText.trim();
+                                break;
+                            }
+                        }
+                        
+                        // Price selectors
+                        const priceSelectors = [
+                            '.price', 
+                            '[class*="price"]', 
+                            '[class*="amount"]',
+                            'span[class*="rs"]',
+                            'span[class*="RS"]',
+                            'span[class*="price"]'
+                        ];
+                        let price = '';
+                        for (const selector of priceSelectors) {
+                            const priceElement = element.querySelector(selector);
+                            if (priceElement) {
+                                price = priceElement.innerText.trim();
+                                break;
+                            }
+                        }
+                        
+                        // If no price found through selectors, try to find price in text content
+                        if (!price) {
+                            const text = element.textContent;
+                            const priceMatch = text.match(/Rs\.?\s*[\d,]+|₹\s*[\d,]+/);
+                            if (priceMatch) {
+                                price = priceMatch[0];
+                            }
+                        }
+                        
+                        // Image selectors
+                        const imageSelectors = ['img', '[class*="image"] img'];
+                        let image = '';
+                        for (const selector of imageSelectors) {
+                            const imageElement = element.querySelector(selector);
+                            if (imageElement) {
+                                image = imageElement.src || imageElement.getAttribute('data-src') || '';
+                                break;
+                            }
+                        }
+                        
+                        // Link - either direct or parent
+                        const link = element.querySelector('a')?.href || element.closest('a')?.href || '';
+
+                        console.log({title, price, image, link});
                         
                         return { title, price, image, link };
-                    });
-                    break;
+                    }).filter(product => product.title || product.price || product.image);
+                    
+                    if (products.length > 0) {
+                        console.log(`Successfully found ${products.length} products with selector ${selector}`);
+                        break;
+                    }
                 }
             }
+            
+            // If no products found, try a more aggressive approach
+            if (products.length === 0) {
+                console.log('No products found with standard selectors, trying fallback approach');
+                
+                // Look for any elements with price-like text
+                const allElements = document.querySelectorAll('*');
+                const candidates = Array.from(allElements).filter(el => {
+                    const text = el.textContent;
+                    return text.includes('Rs.') || text.includes('₹') || /\d+,\d+/.test(text);
+                });
+                
+                products = candidates.map(el => {
+                    const img = el.querySelector('img');
+                    const link = el.querySelector('a');
+                    if (img) {
+                        return {
+                            title: el.textContent.split('\n')[0].trim(),
+                            price: (el.textContent.match(/Rs\.?\s*[\d,]+|₹\s*[\d,]+/) || [''])[0],
+                            image: img.src || img.getAttribute('data-src') || '',
+                            link: link?.href || ''
+                        };
+                    }
+                    return null;
+                }).filter(Boolean);
+            }
+
             return products;
         });
     } catch (error) {
@@ -220,36 +309,113 @@ async function scrapeWebsite(url, searchTerm) {
             '--no-sandbox',
             '--disable-setuid-sandbox',
             '--disable-web-security',
-            '--disable-features=IsolateOrigins,site-per-process'
+            '--disable-features=IsolateOrigins,site-per-process',
+            '--disable-dev-shm-usage',
+            '--disable-gpu',
+            '--window-size=1920,1080',
+            '--disable-accelerated-2d-canvas',
+            '--disable-blink-features=AutomationControlled',
+            '--disable-background-timer-throttling',
+            '--disable-backgrounding-occluded-windows',
+            '--disable-breakpad',
+            '--disable-component-extensions-with-background-pages',
+            '--disable-extensions',
+            '--disable-features=TranslateUI,BlinkGenPropertyTrees',
+            '--disable-ipc-flooding-protection',
+            '--disable-renderer-backgrounding',
+            '--enable-features=NetworkService,NetworkServiceInProcess',
+            '--force-color-profile=srgb',
+            '--metrics-recording-only',
+            '--no-first-run',
+            '--password-store=basic'
         ]
     });
     
     try {
         const page = await browser.newPage();
         
-        // Set viewport and user agent
+        // Enhanced page settings
         await page.setViewport({ width: 1920, height: 1080 });
-        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
         
-        // Enable request interception
-        await page.setRequestInterception(true);
-        page.on('request', (request) => {
-            if (['image', 'stylesheet', 'font'].includes(request.resourceType())) {
-                request.abort();
-            } else {
-                request.continue();
-            }
+        // More realistic user agent
+        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+        
+        // Increase default timeout
+        await page.setDefaultTimeout(60000); // 60 seconds
+        
+        // Enhanced headers
+        await page.setExtraHTTPHeaders({
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'none',
+            'Sec-Fetch-User': '?1'
         });
 
+        // Modify WebDriver flags
+        await page.evaluateOnNewDocument(() => {
+            delete Object.getPrototypeOf(navigator).webdriver;
+            Object.defineProperty(navigator, 'webdriver', {
+                get: () => false,
+            });
+            window.navigator.chrome = {
+                runtime: {},
+            };
+            Object.defineProperty(navigator, 'languages', {
+                get: () => ['en-US', 'en'],
+            });
+        });
+
+        // Enhanced navigation with progressive timeout
         console.log(`Navigating to ${url}...`);
-        await page.goto(url, { 
-            waitUntil: 'networkidle0',
-            timeout: 100000 
-        });
+        let navigationSuccess = false;
+        let retryCount = 0;
+        const maxRetries = 3;
+        let timeout = 30000; // Start with 30 seconds
 
-        if (await hasCloudflareProtection(page)) {
+        while (!navigationSuccess && retryCount < maxRetries) {
+            console.log("Retry count is: ", retryCount);
+            try {
+                console.log("Navigating to URL");
+                await page.goto(url, { 
+                    waitUntil: ['domcontentloaded', 'networkidle2'],
+                    timeout: timeout
+                });
+
+                navigationSuccess = true;
+            } catch (error) {
+                retryCount++;
+                console.log(`Navigation attempt ${retryCount} failed. ${maxRetries - retryCount} attempts remaining.`);
+                
+                if (retryCount === maxRetries) {
+                    throw new Error(`Failed to navigate after ${maxRetries} attempts: ${error.message}`);
+                }
+                
+                // Clear browser data
+                const client = await page.target().createCDPSession();
+                await client.send('Network.clearBrowserCookies');
+                await client.send('Network.clearBrowserCache');
+                
+                // Increase timeout progressively
+                timeout += 15000;
+                await delay(10000); // Increased delay between retries
+            }
+        }
+
+        // Check for Cloudflare
+        const hasCloudflare = await hasCloudflareProtection(page);
+        if (hasCloudflare) {
+            console.log('Detected Cloudflare protection, attempting to bypass...');
             await waitForCloudflareToPass(page);
         }
+
+        // Wait for the page to be fully loaded
+        await page.waitForFunction(() => document.readyState === 'complete');
+        await delay(3000); // Additional wait for dynamic content
 
         console.log('Analyzing homepage...');
         let searchElements = await analyzeHtmlWithGroq(page);
@@ -264,40 +430,122 @@ async function scrapeWebsite(url, searchTerm) {
         }
 
         console.log(`Found search selector: ${searchElements.searchSelector}`);
-        await page.waitForSelector(searchElements.searchSelector, { timeout: 5000 });
-        await page.type(searchElements.searchSelector, searchTerm);
+        
+        // Wait for search element with retry
+        let searchElement = null;
+        retryCount = 0;
+        while (!searchElement && retryCount < 3) {
+            try {
+                searchElement = await page.waitForSelector(searchElements.searchSelector, { 
+                    timeout: 5000,
+                    visible: true 
+                });
+            } catch (error) {
+                retryCount++;
+                await delay(2000);
+            }
+        }
 
-        // Submit search
+        if (!searchElement) {
+            throw new Error('Search element not found after retries');
+        }
+
+        // Type with human-like delays
+        for (const char of searchTerm) {
+            await page.type(searchElements.searchSelector, char);
+            await delay(Math.random() * 100 + 50);
+        }
+
+        // Submit search with fallback options
+        console.log('Submitting search...');
         if (searchElements.submitSelector) {
-            await page.click(searchElements.submitSelector);
+            await Promise.any([
+                page.click(searchElements.submitSelector),
+                page.keyboard.press('Enter')
+            ]);
         } else {
             await page.keyboard.press('Enter');
         }
 
-        // Wait for navigation
+        // Wait for search results with longer timeout
+        // try {
+        //     await page.waitForNavigation({ 
+        //         waitUntil: ['domcontentloaded', 'networkidle2'],
+        //         timeout: 20000 
+        //     });
+        // } catch (error) {
+        //     console.log(error)
+        //     console.log('Navigation timeout after search, continuing...');
+        // }
+
         try {
-            await page.waitForNavigation({ 
-                waitUntil: 'networkidle0',
-                timeout: 10000 
-            });
+            // Try multiple strategies to detect search completion
+            await Promise.race([
+                // Strategy 1: Wait for URL change
+                page.waitForFunction(
+                    () => window.location.href.includes('search') || 
+                          window.location.href.includes('q='),
+                    { timeout: 30000 }
+                ),
+
+                
+                
+                // Strategy 2: Wait for results container
+                page.waitForFunction(
+                    () => {
+                        const possibleSelectors = [
+                            '.search-results',
+                            '.product-grid',
+                            '.MuiGrid-root',
+                            '[data-testid="search-results"]',
+                            '.grid-cols-2'
+                        ];
+                        return possibleSelectors.some(selector => 
+                            document.querySelector(selector) !== null
+                        );
+                    },
+                    { timeout: 30000 }
+                ),
+                
+                // Strategy 3: Wait for network idle
+                page.waitForFunction(
+                    () => !document.querySelector('.loading-indicator'),
+                    { timeout: 30000 }
+                )
+            ]);
+            
+            // Additional wait for content to stabilize
+            await delay(5000);
+            
+            // Take screenshot for debugging
+            await page.screenshot({ path: 'after-search.png' });
+            
+            // Log current URL and page content
+            const currentUrl = await page.url();
+            console.log('Current URL after search:', currentUrl);
+            
         } catch (error) {
-            console.log('Navigation timeout, continuing with extraction...');
+            console.error('Search completion detection failed:', error);
+            // Continue anyway as the content might still be accessible
         }
 
-        // Additional wait for dynamic content
+        
+
+        // Wait for any dynamic content
         await delay(5000);
         
         console.log('Extracting search results...');
-        console.log("The content sent to the Groq API is: ", await page.content());
         const results = await extractSearchResults(page);
-
+        console.log("Results are: ", results);
         return results;
 
     } catch (error) {
         console.error('Error during scraping:', error);
         throw error;
     } finally {
-        await browser.close();
+        if (browser) {
+            await browser.close();
+        }
     }
 }
 
