@@ -17,7 +17,8 @@ import DataInputForm from "../components/DataInputForm";
 
 export default function Home() {
 	const { user } = useAuth0();
-	console.log(user);
+
+
 	return (
 		<IonPage>
 			<IonHeader>

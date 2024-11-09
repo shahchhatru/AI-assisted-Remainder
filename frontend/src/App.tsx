@@ -42,17 +42,28 @@ import "./index.css";
 import { useAuth0 } from "@auth0/auth0-react";
 import WelcomePage from "./pages/WelcomePage";
 import Home from "./pages/Home";
+import { useEffect } from "react";
 setupIonicReact();
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import MyRequests from "./pages/MyRequests";
+
 export default function App() {
-	const { isAuthenticated, isLoading } = useAuth0();
+	const { isAuthenticated, isLoading, user } = useAuth0();
 
 	if (isLoading) {
 		return <IonLoading>Loading...</IonLoading>;
 	}
 
+	useEffect(() => {
+		(async () => {
+			localStorage.setItem("accessTokenAuth0", user?.sub || "")
+		})();
+	}, [user, isAuthenticated]);
+
 	return (
-		<IonApp>
+		<IonApp><ToastContainer autoClose={1500} hideProgressBar={true} newestOnTop={true} />
 			<IonReactRouter>
 				<IonRouterOutlet>
 					<Route
@@ -77,6 +88,18 @@ export default function App() {
 							);
 						}}
 					/>
+					<Route
+						exact
+						path="/my-requests"
+						render={() => {
+							return isAuthenticated ? (
+								<MyRequests />
+							) : (
+								<Redirect to={"/"} />
+							);
+						}}
+					/>
+
 					{/* <Route>
 						<Redirect to="/" />
 					</Route> */}

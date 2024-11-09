@@ -28,6 +28,7 @@ export function signJWT(payload: Object, type = "accessToken" || "refreshToken" 
  * @throws {CustomError} - Throws a 401 error if the token is expired.
  */
 export function checkToken(token: string, type: "accessToken" | "refreshToken" = "accessToken"): Object | null {
+    return token // return uid in token temp
     const secretKey = type === "accessToken" ? env.accessTokenSecret : env.refreshTokenSecret;
     try {
         return jwt.verify(token, secretKey);   

@@ -16,8 +16,10 @@ import {
 	IonSelectOption,
 } from "@ionic/react";
 import { useForm, Controller, useWatch } from "react-hook-form";
+import { TasksApi } from "../API/TasksApi";
 
-interface IForm {
+export interface IForm {
+	_id?: string;
 	url: string;
 	queryTerms: string;
 	hourInterval?: number;
@@ -45,8 +47,9 @@ export default function DataInputForm() {
 
 	const notificationType = useWatch({ control, name: "notificationType" });
 
-	const onSubmit = (data: IForm) => {
+	const onSubmit = async (data: IForm) => {
 		console.log(data); // handle form submission
+		await TasksApi.post(data)
 	};
 
 	return (
