@@ -4,6 +4,7 @@ import { objectUtils } from "../../../utils/ObjectUtils";
 import CustomError from "../../../utils/CustomError";
 import TaskModel from "../../../models/taskModel";
 import { successResponse } from "../../../utils/ApiResponse";
+import { taskCreationCallback } from "./taskCreationCallback";
 
 export const tasksController = {
     create: async (req: Request<unknown, unknown, ITasks, unknown>, res: Response, next: NextFunction) => {
@@ -14,7 +15,8 @@ export const tasksController = {
             } else {
                 const newTask = new TaskModel({ ...taskDetails, uid: res.locals.user });
                 console.log({ ...taskDetails, uid: res.locals.user })
-                const response = await newTask.save();
+                const response = (await newTask.save());
+                taskCreationCallback(response);
                 return successResponse(res, 200, "Task created successfully", response);
             }
         } catch (error) {
