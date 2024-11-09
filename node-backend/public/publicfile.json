@@ -1,0 +1,85 @@
+{
+    "development_regions": [
+        {
+            "name": "Eastern Development Region",
+            "capital": "Dharan",
+            "districts": [
+                "Bhojpur",
+                "Dhankuta",
+                "Ilam",
+                "Jhapa",
+                "Khotang",
+                "Morang",
+                "Okhaldhunga",
+                "Panchthar",
+                "Sankhuwasabha",
+                "Solukhumbu",
+                "Sunsari",
+                "Taplejung",
+                "Terhathum",
+                "Udayapur"
+            ]
+        },
+        {
+            "name": "Central Development Region",
+            "capital": "Hetauda",
+            "districts": [
+                "Bagmati",
+                "Bhaktapur",
+                "Dhading",
+                "Dolakha",
+                "Kathmandu",
+                "Kavrepalanchok",
+                "Lalitpur",
+                "Nuwakot",
+                "Ramechhap",
+                "Rasuwa",
+                "Sindhuli",
+                "Sindhupalchok"
+            ]
+        },
+        {
+            "name": "Western Development Region",
+            "capital": "Pokhara",
+            "districts": [
+                "Gorkha",
+                "Kaski",
+                "Lamjung",
+                "Manang",
+                "Mustang",
+                "Myagdi",
+                "Nawalparasi East",
+                "Parbat",
+                "Syangja",
+                "Tanahun"
+            ]
+        },
+        {
+            "name": "Mid-Western Development Region",
+            "capital": "Birendranagar",
+            "districts": [
+                "Banke",
+                "Bardiya",
+                "Dailekh",
+                "Dang",
+                "Jajarkot",
+                "Surkhet"
+            ]
+        },
+        {
+            "name": "Far-Western Development Region",
+            "capital": "Dipayal",
+            "districts": [
+                "Achham",
+                "Baitadi",
+                "Bajhang",
+                "Bajura",
+                "Dadeldhura",
+                "Darchula",
+                "Doti",
+                "Kailali",
+                "Kanchanpur"
+            ]
+        }
+    ]
+}
