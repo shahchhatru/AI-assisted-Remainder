@@ -1,17 +1,6 @@
 /** @format */
 
-import {
-	IonAvatar,
-	IonCol,
-	IonContent,
-	IonGrid,
-	IonHeader,
-	IonPage,
-	IonRow,
-	IonTitle,
-	IonToolbar,
-} from "@ionic/react";
-import LogoutButton from "../components/Logout";
+import { IonContent, IonGrid, IonPage } from "@ionic/react";
 import { useAuth0 } from "@auth0/auth0-react";
 import DataInputForm from "../components/DataInputForm";
 
@@ -21,7 +10,7 @@ export default function Home() {
 
 	return (
 		<IonPage>
-			<IonHeader>
+			{/* <IonHeader>
 				<IonToolbar
 					color="secondary"
 					className="ion-padding ion-justify-content-between"
@@ -38,16 +27,15 @@ export default function Home() {
 						</IonAvatar>
 					)}
 				</IonToolbar>
-			</IonHeader>
+			</IonHeader> */}
 
 			<IonContent>
 				<IonGrid>
-					<IonRow>
+					{/* <IonRow>
 						<IonCol class="ion-text-end ">
 							<LogoutButton />
 						</IonCol>
-					</IonRow>
-					<IonRow></IonRow>
+					</IonRow> */}
 				</IonGrid>
 				<DataInputForm />
 			</IonContent>

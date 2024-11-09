@@ -96,25 +96,23 @@ export default function MyRequests() {
 
     return (
         <IonPage>
-            <IonHeader>
+            <IonHeader >
                 <IonToolbar
                     color="secondary"
-                    className="ion-padding ion-justify-content-between"
+                    className="ion-justify-content-between"
                 >
-                    <IonTitle className="ion-text-center">
-                        Your entries
+                    <IonTitle className="ion-text-center" >
+                        Your Requests
                     </IonTitle>
                 </IonToolbar>
             </IonHeader>
             <IonContent className="ion-padding">
-                <IonText color="primary">
-                    <h1 className="text-2xl font-bold mb-4">My Requests</h1>
-                </IonText>
+
                 {tasks.length > 0 ? (
                     <IonGrid>
                         <IonRow>
                             <IonCol size="2" ><strong>URL</strong></IonCol>
-                            <IonCol size="2" class="ion-text-center"><strong>Query Terms</strong></IonCol>
+                            <IonCol size="2" class="ion-text-center "><strong>Query Terms</strong></IonCol>
                             <IonCol size="2" class="ion-text-center"><strong>Notification Type</strong></IonCol>
                             <IonCol size="2" class="ion-text-center"><strong>Interval</strong></IonCol>
                             <IonCol size="2" class="ion-text-center"><strong>Notification Time</strong></IonCol>

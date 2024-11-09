@@ -3,8 +3,13 @@
 import { Redirect, Route } from "react-router-dom";
 import {
 	IonApp,
+	IonIcon,
+	IonLabel,
 	IonLoading,
 	IonRouterOutlet,
+	IonTabBar,
+	IonTabButton,
+	IonTabs,
 	setupIonicReact,
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
@@ -48,9 +53,11 @@ setupIonicReact();
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import MyRequests from "./pages/MyRequests";
+import { home, person, list, logOut } from 'ionicons/icons';
+import Profile from "./pages/Profile";
 
 export default function App() {
-	const { isAuthenticated, isLoading, user } = useAuth0();
+	const { isAuthenticated, isLoading, user, logout } = useAuth0();
 
 	if (isLoading) {
 		return <IonLoading>Loading...</IonLoading>;
@@ -63,47 +70,48 @@ export default function App() {
 	}, [user, isAuthenticated]);
 
 	return (
-		<IonApp><ToastContainer autoClose={1500} hideProgressBar={true} newestOnTop={true} />
-			<IonReactRouter>
-				<IonRouterOutlet>
-					<Route
-						exact
-						path="/"
-						render={() => {
-							return isAuthenticated ? (
-								<Redirect to={"/home"} />
-							) : (
-								<WelcomePage />
-							);
-						}}
-					/>
-					<Route
-						exact
-						path="/home"
-						render={() => {
-							return isAuthenticated ? (
-								<Home />
-							) : (
-								<Redirect to={"/"} />
-							);
-						}}
-					/>
-					<Route
-						exact
-						path="/my-requests"
-						render={() => {
-							return isAuthenticated ? (
-								<MyRequests />
-							) : (
-								<Redirect to={"/"} />
-							);
-						}}
-					/>
+		<IonApp>
+			<ToastContainer autoClose={1500} hideProgressBar={true} newestOnTop={true} />
 
-					{/* <Route>
-						<Redirect to="/" />
-					</Route> */}
-				</IonRouterOutlet>
+			<IonReactRouter>
+				<IonTabs>
+					<IonRouterOutlet>
+						<Route exact path="/" render={() => {
+							return isAuthenticated ? <Redirect to="/home" /> : <WelcomePage />;
+						}} />
+						<Route exact path="/home" render={() => {
+							return isAuthenticated ? <Home /> : <Redirect to="/" />;
+						}} />
+						<Route exact path="/my-requests" render={() => {
+							return isAuthenticated ? <MyRequests /> : <Redirect to="/" />;
+						}} />
+						<Route exact path="/profile" render={() => {
+							return isAuthenticated ? <Profile /> : <Redirect to="/" />;
+						}} />
+					</IonRouterOutlet>
+
+					{isAuthenticated && <IonTabBar slot="bottom">
+						<IonTabButton tab="home" href="/home">
+							<IonIcon icon={home} />
+							<IonLabel>Home</IonLabel>
+						</IonTabButton>
+						<IonTabButton tab="my-requests" href="/my-requests">
+							<IonIcon icon={list} />
+							<IonLabel>My Requests</IonLabel>
+						</IonTabButton>
+						<IonTabButton tab="profile" href="/profile">
+							<IonIcon icon={person} />
+							<IonLabel>Profile</IonLabel>
+						</IonTabButton>
+
+						{/* Logout button aligned to the right */}
+						<IonTabButton onClick={async () => await logout({ logoutParams: { returnTo: window.location.origin } })}  >
+							<IonIcon icon={logOut} color="danger"  onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })} />
+							<IonLabel>Logout</IonLabel>
+						</IonTabButton>
+					</IonTabBar>
+					}
+				</IonTabs>
 			</IonReactRouter>
 		</IonApp>
 	);

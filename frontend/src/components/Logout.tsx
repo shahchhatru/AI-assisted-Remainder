@@ -11,6 +11,7 @@ const LogoutButton = () => {
 			onClick={() =>
 				logout({ logoutParams: { returnTo: window.location.origin } })
 			}
+			color={"danger"}
 		>
 			Log Out
 		</IonButton>
