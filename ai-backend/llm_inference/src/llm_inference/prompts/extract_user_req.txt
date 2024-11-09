@@ -36,8 +36,6 @@ User Query:
 
 Expected JSON Output:
 
-json
-Copy code
 {
   "product_name": "shirt",
   "price": 29.99,
