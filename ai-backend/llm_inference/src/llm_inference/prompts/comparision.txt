@@ -1,0 +1,18 @@
+You will receive two pieces of information:
+
+Website Content: A long block of text containing the content of a webpage. This
+includes all the information available on the page (e.g., titles, paragraphs,
+lists, links, etc.).
+
+User Query: A short string describing what the user is looking for. It may be a
+specific topic, product, or piece of information.
+
+Your task is to:
+
+Compare the website content with the user's query.
+Determine whether the website content contains the information that the user is
+asking for.
+Your response should be a single word: either "yes" or "no".
+
+"Yes": If the website contains the information the user is asking for.
+"No": If the website does not contain the requested information.
