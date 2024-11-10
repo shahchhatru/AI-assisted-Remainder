@@ -49,13 +49,13 @@ const taskSchema = new Schema<ITasks>({
                 const htmldata = await scrapesite(task.url, task.queryTerms);
                 
                 //call an api
-                const response =await axios.post('http://publicip/run_prompt', {
+                const response =await axios.post('http://20.197.34.102:8000/run_prompt', {
                     data: htmldata,
                     queryTerms: task.queryTerms,
                   });
                 
                 if (response){
-                    //send mail if success
+                    //send mail if success          
                     await sendMailData(task.email,response);
 
                 }
