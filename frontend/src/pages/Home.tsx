@@ -1,8 +1,9 @@
 /** @format */
 
-import { IonContent, IonGrid, IonPage } from "@ionic/react";
+import { IonAvatar, IonContent, IonGrid, IonHeader, IonPage, IonTitle, IonToolbar } from "@ionic/react";
 import { useAuth0 } from "@auth0/auth0-react";
 import DataInputForm from "../components/DataInputForm";
+import { Link } from "react-router-dom";
 
 export default function Home() {
 	const { user } = useAuth0();
@@ -10,13 +11,13 @@ export default function Home() {
 
 	return (
 		<IonPage>
-			{/* <IonHeader>
+			<IonHeader>
 				<IonToolbar
 					color="secondary"
-					className="ion-padding ion-justify-content-between"
+					className=""
 				>
 					<IonTitle className="ion-text-center">
-						{user?.nickname ? `Hello ${user?.nickname}` : ""}
+						{user?.nickname ? `Hello ${user?.nickname}` : ""} - You can schedule remainder here - <Link to="/how-to-use">Need Help?</Link>
 					</IonTitle>
 					{user?.picture && (
 						<IonAvatar slot="end">
@@ -26,8 +27,9 @@ export default function Home() {
 							/>
 						</IonAvatar>
 					)}
+
 				</IonToolbar>
-			</IonHeader> */}
+			</IonHeader>
 
 			<IonContent>
 				<IonGrid>

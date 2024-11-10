@@ -53,8 +53,9 @@ setupIonicReact();
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import MyRequests from "./pages/MyRequests";
-import { home, person, list, logOut } from 'ionicons/icons';
+import { home, person, list, logOut, helpOutline } from 'ionicons/icons';
 import Profile from "./pages/Profile";
+import HowToUsePage from "./pages/HowToUse";
 
 export default function App() {
 	const { isAuthenticated, isLoading, user, logout } = useAuth0();
@@ -88,6 +89,9 @@ export default function App() {
 						<Route exact path="/profile" render={() => {
 							return isAuthenticated ? <Profile /> : <Redirect to="/" />;
 						}} />
+						<Route exact path="/how-to-use" render={() => {
+							return isAuthenticated ? <HowToUsePage /> : <Redirect to="/" />;
+						}} />
 					</IonRouterOutlet>
 
 					{isAuthenticated && <IonTabBar slot="bottom">
@@ -103,10 +107,14 @@ export default function App() {
 							<IonIcon icon={person} />
 							<IonLabel>Profile</IonLabel>
 						</IonTabButton>
+						<IonTabButton tab="how-to-use" href="/how-to-use">
+							<IonIcon icon={helpOutline} />
+							<IonLabel>How to use</IonLabel>
+						</IonTabButton>
 
 						{/* Logout button aligned to the right */}
 						<IonTabButton onClick={async () => await logout({ logoutParams: { returnTo: window.location.origin } })}  >
-							<IonIcon icon={logOut} color="danger"  onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })} />
+							<IonIcon icon={logOut} color="danger" onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })} />
 							<IonLabel>Logout</IonLabel>
 						</IonTabButton>
 					</IonTabBar>

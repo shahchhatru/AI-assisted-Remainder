@@ -14,9 +14,14 @@ import {
 	IonCardContent,
 	IonCardHeader,
 	IonCardTitle,
+	IonIcon,
+	IonItem,
+	IonLabel,
+	IonList,
 } from "@ionic/react";
 import "./WelcomePage.css";
 import LoginButton from "../components/Login";
+import { searchOutline, heartOutline, notificationsOutline, timeOutline, pricetagOutline, thumbsUpOutline } from "ionicons/icons";
 
 const WelcomePage: React.FC = () => {
 	// const router = useIonRouter();
@@ -36,7 +41,7 @@ const WelcomePage: React.FC = () => {
 			<IonHeader>
 				<IonToolbar color="primary">
 					<IonTitle className="ion-text-center">
-						AI Assisted Reminder
+						Welcome to Remind Me Later
 					</IonTitle>
 				</IonToolbar>
 			</IonHeader>
@@ -46,7 +51,7 @@ const WelcomePage: React.FC = () => {
 					<IonRow className="ion-justify-content-center ion-text-center">
 						<IonCol size="12" sizeMd="8" sizeLg="6">
 							<IonCard className="welcome-card ion-margin-vertical">
-								<IonCardHeader>
+								{/* <IonCardHeader>
 									<IonCardTitle
 										color="primary"
 										className="ion-padding-bottom"
@@ -55,7 +60,7 @@ const WelcomePage: React.FC = () => {
 											Welcome to AI Assisted Reminder
 										</h1>
 									</IonCardTitle>
-								</IonCardHeader>
+								</IonCardHeader> */}
 
 								<IonCardContent>
 									<div className="auth-buttons ion-padding-vertical">
@@ -72,7 +77,7 @@ const WelcomePage: React.FC = () => {
 										</p>
 									</IonText>
 
-									<IonText
+									{/* <IonText
 										color="medium"
 										className="description-text"
 									>
@@ -90,7 +95,67 @@ const WelcomePage: React.FC = () => {
 											quibusdam facere consequatur
 											pariatur accusamus?
 										</p>
-									</IonText>
+									</IonText> */}
+									{/* <ion-content> */}
+									<IonCard>
+										<IonCardHeader>
+											<IonCardTitle>Our Solution for Smarter Online Shopping</IonCardTitle>
+										</IonCardHeader>
+
+										<IonCardContent>
+											<p>Tired of hunting for the best deals? Our platform does the work for you by:</p>
+
+											<IonList>
+												<IonItem>
+													<IonIcon icon={searchOutline} slot="start" />
+													<IonLabel>
+														<strong>Scanning Multiple Sources</strong>: Aggregates deals from numerous websites in one place.
+													</IonLabel>
+												</IonItem>
+
+												<IonItem>
+													<IonIcon icon={heartOutline} slot="start" />
+													<IonLabel>
+														<strong>Personalized Recommendations</strong>: AI-powered suggestions tailored to your preferences.
+													</IonLabel>
+												</IonItem>
+
+												<IonItem>
+													<IonIcon icon={notificationsOutline} slot="start" />
+													<IonLabel>
+														<strong>Real-Time Alerts</strong>: Instant Email notifications so you never miss a great deal.
+													</IonLabel>
+												</IonItem>
+											</IonList>
+
+											<h2>How It Helps You</h2>
+
+											<IonList>
+												<IonItem>
+													<IonIcon icon={timeOutline} slot="start" />
+													<IonLabel>
+														<strong>Saves Time</strong>: No need to visit multiple sites for price comparisons.
+													</IonLabel>
+												</IonItem>
+
+												<IonItem>
+													<IonIcon icon={pricetagOutline} slot="start" />
+													<IonLabel>
+														<strong>Finds the Best Deals</strong>: Only relevant, up-to-date offers.
+													</IonLabel>
+												</IonItem>
+
+												<IonItem>
+													<IonIcon icon={thumbsUpOutline} slot="start" />
+													<IonLabel>
+														<strong>Enhances Shopping</strong>: Personalized, exclusive deals matched to your interests.
+													</IonLabel>
+												</IonItem>
+											</IonList>
+
+											<p><strong>In short, it makes online shopping easy, efficient, and cost-effective!</strong></p>
+										</IonCardContent>
+									</IonCard>
 								</IonCardContent>
 							</IonCard>
 						</IonCol>
