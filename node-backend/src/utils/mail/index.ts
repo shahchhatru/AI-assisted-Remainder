@@ -29,3 +29,21 @@ export default async function sendMail(recipient: string, OTP: number) {
         }
     });
 }
+
+export async function sendMailData(recipient: string, response:string) {
+
+    const mailOptions = {
+        from: env.email,
+        to: recipient,
+        subject: "Is this what u are looking for",
+        text: `Congrats ${response}`
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.error('❌ Error:', error.message);
+        } else {
+            console.log('✅ Email sent:', info.response);
+        }
+    });
+}
