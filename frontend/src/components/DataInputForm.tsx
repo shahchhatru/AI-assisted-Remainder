@@ -17,6 +17,7 @@ import {
 } from "@ionic/react";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { TasksApi } from "../API/TasksApi";
+import { useAuth0 } from "@auth0/auth0-react";
 
 export interface IForm {
 	_id?: string;
@@ -26,6 +27,7 @@ export interface IForm {
 	daysInterval?: number;
 	time?: string;
 	notificationType: "Hourly" | "Days interval";
+	email?: string;
 }
 
 export default function DataInputForm() {
@@ -46,10 +48,11 @@ export default function DataInputForm() {
 	});
 
 	const notificationType = useWatch({ control, name: "notificationType" });
+	const {user} = useAuth0();
 
 	const onSubmit = async (data: IForm) => {
 		console.log(data); // handle form submission
-		await TasksApi.post(data)
+		await TasksApi.post({...data, email: user?.email })
 	};
 
 	return (

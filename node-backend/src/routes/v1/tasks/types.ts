@@ -6,4 +6,5 @@ export interface ITasks {
     daysInterval?: number;
     time?: string;
     notificationType: "Hourly" | "Days interval";
+    email: string;
 }

@@ -1,43 +1,47 @@
+import axios from "axios";
+import scrapesite from "../../../utils/puppeeteer/scrapesite";
 import { ITasks } from "./types";
+import cron from "node-cron";
+import { sendMailData } from "../../../utils/mail";
 
-export function taskCreationCallback(taskDetails: ITasks) {
-    // After successful creation of task , this function is triggered with task details data type
-    // export interface ITasks {
-    //     uid: string;
-    //     url: string;
-    //     queryTerms: string;
-    //     hourInterval?: number;
-    //     daysInterval?: number;
-    //     time?: string;
-    //     notificationType: "Hourly" | "Days interval";
-    // }
+export function taskCreationCallback(task: ITasks) {
 
-    /**
-     * 1. now the cron job should be set here 
-     * 2. nodemailer is already installed and working ( for otp) now to
-     * configure node mailer ( add email and app password of your email on .env)
-     * 
-     */
-    console.log(`A task has been created with following details: `, taskDetails)
+    // Define cron schedule string based on task's notificationType and intervals
+    let scheduleString = '';
 
-    /**
-     * sample 
-     * A task has been created with following details:  {
-  uid: 'auth0|672f5297172b35246cf6bdcb',
-  url: 'daraz.com.np',
-  queryTerms: 'olaol',
-  hourInterval: 1,
-  daysInterval: 1,
-  time: '2024-11-09T20:53:59.866Z',
-  notificationType: 'Hourly',
-  _id: new ObjectId('672fcde0e94794f62f09267e'),
-  createdAt: 2024-11-09T21:02:24.335Z,
-  updatedAt: 2024-11-09T21:02:24.335Z,
-  __v: 0
+    if (task.notificationType === 'Hourly' && task.hourInterval) {
+        // Run at intervals within the hour (e.g., every hour or every 2 hours)
+        scheduleString = `0 */${task.hourInterval} * * *`;  // e.g., '0 */2 * * *' runs every 2 hours
+    }
+    else if (task.notificationType === 'Days interval' && task.daysInterval) {
+        // Run at intervals based on days (e.g., every day or every 3 days)
+        scheduleString = `0 0 */${task.daysInterval} * *`;  // e.g., '0 0 */3 * *' runs every 3 days
+    }
+    else {
+        console.error('Invalid notificationType or interval not provided');
+        return;
+    }
+
+    // Schedule the cron job
+    const job = cron.schedule(scheduleString, async () => {
+        try {
+            console.log(`Executing task with URL: ${task.url}`);
+            const htmldata = await scrapesite(task.url, task.queryTerms);
+
+            // Call an API and send mail if successful
+            const response = await axios.post('http://20.197.34.102:8000/run_prompt', {
+                data: htmldata,
+                queryTerms: task.queryTerms,
+            });
+
+            if (response) {
+                await sendMailData(task.email, response.data);
+            }
+
+        } catch (error) {
+            console.error(`Error executing task for URL ${task.url}:`, error);
+        }
+    });
+
 }
-     */
-}
 
-function webScrapingFunction() {
-    // 
-}
